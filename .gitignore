@@ -20,3 +20,8 @@ target/
 *.iws
 *.iml
 *.ipr
+/out/
+
+### OS files ###
+.DS_Store
+Thumbs.db
