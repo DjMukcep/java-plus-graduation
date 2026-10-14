@@ -1,25 +1,24 @@
-package ru.practicum.feign;
+package practicum;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
-import ru.practicum.dto.stats.EndpointHit;
-import ru.practicum.dto.stats.StatsRequest;
-import ru.practicum.dto.stats.ViewStats;
+import ru.practicum.EndpointHit;
+import ru.practicum.ViewStats;
 
 
 import java.util.Collections;
 import java.util.List;
 
 @Component
-public class StatsServerClientFallbackFactory implements FallbackFactory<StatsServerClient> {
+public class StatsClientFallbackFactory implements FallbackFactory<StatsClient> {
 
-    private final static Logger log = LoggerFactory.getLogger(StatsServerClientFallbackFactory.class);
+    private final static Logger log = LoggerFactory.getLogger(StatsClientFallbackFactory.class);
 
     @Override
-    public StatsServerClient create(Throwable cause) {
-        return new StatsServerClient() {
+    public StatsClient create(Throwable cause) {
+        return new StatsClient() {
 
             @Override
             public void hit(EndpointHit endpointHit) {

@@ -2,10 +2,11 @@ package ru.practicum;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.cloud.openfeign.EnableFeignClients;
+import practicum.StatsClientConfig;
+import org.springframework.context.annotation.Import;
 
 
-@EnableFeignClients
+@Import(StatsClientConfig.class)
 @SpringBootApplication
 public class MainApplication {
     public static void main(String[] args) {

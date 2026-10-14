@@ -17,7 +17,7 @@ import ru.practicum.entity.user.User;
 import ru.practicum.entity.user.UserService;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
-import ru.practicum.feign.StatsServerClient;
+import practicum.StatsClient;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -39,7 +39,7 @@ class EventServiceImplTest {
     @Mock
     private UserService userService;
     @Mock
-    private StatsServerClient statClient;
+    private StatsClient statClient;
 
     @Mock
     private RequestService requestService;

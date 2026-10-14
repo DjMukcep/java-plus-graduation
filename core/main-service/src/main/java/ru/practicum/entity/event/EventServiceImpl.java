@@ -10,12 +10,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import practicum.StatsClient;
+import practicum.StatsRequest;
+import ru.practicum.EndpointHit;
+import ru.practicum.ViewStats;
 import ru.practicum.dto.category.CategoryDto;
 import ru.practicum.dto.event.*;
 import ru.practicum.dto.request.ParticipationRequestDto;
-import ru.practicum.dto.stats.EndpointHit;
-import ru.practicum.dto.stats.StatsRequest;
-import ru.practicum.dto.stats.ViewStats;
 import ru.practicum.entity.category.Category;
 import ru.practicum.entity.category.CategoryMapper;
 import ru.practicum.entity.category.CategoryService;
@@ -28,7 +29,7 @@ import ru.practicum.entity.user.UserService;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.exception.ValidationException;
-import ru.practicum.feign.StatsServerClient;
+
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -43,7 +44,7 @@ import static java.util.Optional.ofNullable;
 @Transactional(readOnly = true)
 public class EventServiceImpl implements EventService {
 
-    private final StatsServerClient statsServerClient;
+    private final StatsClient statsServerClient;
     private final EventRepository eventRepository;
     private final CategoryService categoryService;
     private final RequestService requestService;
