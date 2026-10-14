@@ -81,3 +81,11 @@ spring:
                 backoff:
                   firstBackoff: 100ms
                   maxBackoff: 500ms
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    gateway:
+      enabled: true
