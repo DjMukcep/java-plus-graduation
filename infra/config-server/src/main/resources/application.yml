@@ -1,5 +1,5 @@
 server:
-  port: 8888
+  port: 0
 
 spring:
   application:
@@ -15,3 +15,8 @@ spring:
             - file:./infra/config-repo/infra
             - file:./infra/config-repo/core
             - file:./infra/config-repo/stats
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/
