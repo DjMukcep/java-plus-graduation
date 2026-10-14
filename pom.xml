@@ -16,7 +16,7 @@
 		<module>stats</module>
 		<module>core</module>
 		<module>infra</module>
-	</modules>
+    </modules>
 
 	<groupId>ru.practicum</groupId>
 	<artifactId>explore-with-me</artifactId>

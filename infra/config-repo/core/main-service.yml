@@ -20,5 +20,3 @@ spring:
   sql:
     init:
       mode: always
-#client:
-#  url=http://localhost:9090:
