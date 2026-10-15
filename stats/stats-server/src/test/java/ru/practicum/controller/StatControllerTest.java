@@ -22,7 +22,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
 @WebMvcTest(StatController.class)
-@ActiveProfiles("test")
 class StatControllerTest {
 
     @Autowired
