@@ -3,6 +3,9 @@ server:
 spring:
   cloud:
     openfeign:
+      httpclient:
+        hc5:
+          enabled: true
       circuitbreaker:
         enabled: true
   datasource:
@@ -20,3 +23,12 @@ spring:
   sql:
     init:
       mode: always
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always

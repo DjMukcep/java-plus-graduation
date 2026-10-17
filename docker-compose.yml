@@ -29,3 +29,18 @@ services:
       retries: 15
     ports:
       - "7542:5432"
+
+  ewm-user-db:
+    image: postgres:16.1
+    container_name: postgres-ewm-user-db
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: user
+      POSTGRES_DB: ewm-user
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 10s
+      retries: 15
+    ports:
+      - "8542:5432"

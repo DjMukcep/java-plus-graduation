@@ -13,21 +13,21 @@ import java.util.Optional;
 
 public interface EventRepository extends JpaRepository<Event, Long>, QuerydslPredicateExecutor<Event> {
 
-    @EntityGraph(attributePaths = {"category","initiator"})
+    @EntityGraph(attributePaths = "category")
     List<Event> findAllByInitiatorId(Long initiatorId, Pageable pageable);
 
     @NonNull
-    @EntityGraph(attributePaths = {"category","initiator"})
+    @EntityGraph(attributePaths = "category")
     Page<Event> findAll(@NonNull Pageable pageable);
 
     @NonNull
-    @EntityGraph(attributePaths = {"category","initiator"})
+    @EntityGraph(attributePaths = "category")
     Page<Event> findAll(@NonNull Predicate predicate, @NonNull Pageable pageable);
 
-    @EntityGraph(attributePaths = {"category", "initiator"})
+    @EntityGraph(attributePaths = "category")
     Optional<Event> findWithRelationsById(Long id);
 
-    @EntityGraph(attributePaths = {"category", "initiator"})
+    @EntityGraph(attributePaths = "category")
     Optional<Event> findByIdAndState(Long id, EventState state);
 
     boolean existsByCategoryId(Long categoryId);

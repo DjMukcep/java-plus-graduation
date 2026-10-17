@@ -2,8 +2,8 @@ package ru.practicum.entity.request;
 
 import lombok.experimental.UtilityClass;
 import ru.practicum.dto.request.ParticipationRequestDto;
+import ru.practicum.dto.user.UserDto;
 import ru.practicum.entity.event.Event;
-import ru.practicum.entity.user.User;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -14,10 +14,10 @@ public class RequestMapper {
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    public static Request toRequest(Event event, User user) {
+    public static Request toRequest(Event event, UserDto user) {
         return Request.builder()
                 .event(event)
-                .user(user)
+                .requesterId(user.getId())
                 .createdAt(LocalDateTime.now())
                 .status(isStatusConfirmed(event) ? RequestStatus.CONFIRMED : RequestStatus.PENDING)
                 .build();
@@ -28,7 +28,7 @@ public class RequestMapper {
                 .id(request.getId())
                 .created(request.getCreatedAt().format(formatter))
                 .eventId(request.getEvent().getId())
-                .requesterId(request.getUser().getId())
+                .requesterId(request.getRequesterId())
                 .status(request.getStatus().name())
                 .build();
     }

@@ -2,10 +2,11 @@ package ru.practicum.entity.event;
 
 import lombok.experimental.UtilityClass;
 import ru.practicum.dto.event.*;
+import ru.practicum.dto.user.UserDto;
 import ru.practicum.dto.user.UserShortDto;
 import ru.practicum.dto.category.CategoryDto;
 import ru.practicum.entity.category.Category;
-import ru.practicum.entity.user.User;
+
 import ru.practicum.exception.ValidationException;
 
 import java.time.LocalDateTime;
@@ -20,7 +21,9 @@ public class EventMapper {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    public static Event mapToEntity(NewEventDto eventDto, Category category, User user) {
+    public static Event mapToEntity(NewEventDto eventDto,
+                                    Category category,
+                                    UserDto userDto) {
         Event entity = new Event();
 
         entity.setTitle(eventDto.getTitle());
@@ -42,7 +45,7 @@ public class EventMapper {
         entity.setDescription(eventDto.getDescription());
         entity.setParticipantLimit(eventDto.getParticipantLimit());
         entity.setCreatedOn(LocalDateTime.now());
-        entity.setInitiator(user);
+        entity.setInitiatorId(userDto == null ? 0 : userDto.getId());
         entity.setLocation(new Location(eventDto.getLocation().getLat(), eventDto.getLocation().getLon()));
         entity.setPaid(eventDto.getPaid());
         entity.setState(EventState.PENDING);
@@ -51,7 +54,10 @@ public class EventMapper {
         return entity;
     }
 
-    public static EventFullDto toEventFullDto(Event event, Long confirmedRequests, Long views) {
+    public static EventFullDto toEventFullDto(Event event,
+                                              Long confirmedRequests,
+                                              Long views,
+                                              UserDto userDto) {
         return EventFullDto.builder()
                 .id(event.getId())
                 .annotation(event.getAnnotation())
@@ -60,7 +66,8 @@ public class EventMapper {
                 .createdOn(event.getCreatedOn().format(FORMATTER))
                 .description(event.getDescription())
                 .eventDate(event.getEventDate().format(FORMATTER))
-                .initiator(new UserShortDto(event.getInitiator().getId(), event.getInitiator().getName()))
+                .initiator(new UserShortDto(event.getInitiatorId(),
+                        userDto == null ? "unknown" : userDto.getName()))
                 .location(new Location(event.getLocation().getLat(), event.getLocation().getLon()))
                 .requestModeration(event.getRequestModeration())
                 .paid(event.getPaid())
@@ -74,23 +81,28 @@ public class EventMapper {
                 .build();
     }
 
-    public static EventShortDto toEventShortDto(Event event, Long confirmedRequests, Long views) {
+    public static EventShortDto toEventShortDto(Event event,
+                                                Long confirmedRequests,
+                                                Long views,
+                                                UserDto userDto) {
         return EventShortDto.builder()
                 .id(event.getId())
                 .annotation(event.getAnnotation())
                 .category(new CategoryDto(event.getCategory().getId(), event.getCategory().getName()))
                 .confirmedRequests(confirmedRequests)
                 .eventDate(event.getEventDate().format(FORMATTER))
-                .initiator(new UserShortDto(event.getInitiator().getId(), event.getInitiator().getName()))
+                .initiator(new UserShortDto(event.getInitiatorId(),
+                        userDto == null ? "unknown" : userDto.getName()))
                 .paid(event.getPaid())
                 .title(event.getTitle())
                 .views(views)
                 .build();
     }
 
-    public static List<EventShortDto> toEventShortDto(List<Event> events,
-                                                      Map<Long, Long> confirmedRequests,
-                                                      Map<Long, Long> views) {
+    public static List<EventShortDto> toEventShortDtos(List<Event> events,
+                                                       Map<Long, Long> confirmedRequests,
+                                                       Map<Long, Long> views,
+                                                       UserDto userDto) {
         return events.stream()
                 .map(event ->
                         EventShortDto.builder()
@@ -99,7 +111,8 @@ public class EventMapper {
                                 .category(new CategoryDto(event.getCategory().getId(), event.getCategory().getName()))
                                 .confirmedRequests(confirmedRequests.getOrDefault(event.getId(), 0L))
                                 .eventDate(event.getEventDate().format(FORMATTER))
-                                .initiator(new UserShortDto(event.getInitiator().getId(), event.getInitiator().getName()))
+                                .initiator(new UserShortDto(event.getInitiatorId(),
+                                        userDto == null ? "unknown" : userDto.getName()))
                                 .paid(event.getPaid())
                                 .title(event.getTitle())
                                 .views(views.getOrDefault(event.getId(), 0L))

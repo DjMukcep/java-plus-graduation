@@ -4,32 +4,33 @@ import lombok.experimental.UtilityClass;
 import ru.practicum.dto.comment.CommentDto;
 import ru.practicum.dto.comment.LogComment;
 import ru.practicum.dto.comment.NewCommentDto;
-import ru.practicum.dto.comment.UserCommentAdminDto;
+
+import ru.practicum.dto.user.UserDto;
 import ru.practicum.entity.event.Event;
-import ru.practicum.entity.user.User;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 
 @UtilityClass
 public class CommentMapper {
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    public static Comment toComment(NewCommentDto comment, User author, Event event) {
+    public static Comment toComment(NewCommentDto comment, Long authorId, Event event) {
         return Comment.builder()
                 .text(comment.getText())
-                .author(author)
+                .authorId(authorId)
                 .event(event)
                 .build();
     }
 
-    public static CommentDto toCommentDto(Comment comment) {
+    public static CommentDto toCommentDto(Comment comment, String authorName) {
         return CommentDto.builder()
                 .id(comment.getId())
-                .authorId(comment.getAuthor().getId())
+                .authorId(comment.getAuthorId())
                 .eventId(comment.getEvent().getId())
-                .authorName(comment.getAuthor().getName())
+                .authorName(authorName)
                 .text(comment.getText())
                 .created(comment.getCreated().format(formatter))
                 .updated(comment.getUpdated() != null ?
@@ -37,19 +38,10 @@ public class CommentMapper {
                 .build();
     }
 
-    public static List<CommentDto> toCommentDto(List<Comment> comments) {
+    public static List<CommentDto> toCommentDto(List<Comment> comments, Map<Long, UserDto> authors) {
         return comments.stream()
-                .map(CommentMapper::toCommentDto)
+                .map(comment -> toCommentDto(comment,authors.get(comment.getAuthorId()).getName()))
                 .toList();
-    }
-
-    public static UserCommentAdminDto toUserCommentAdminDto(User user) {
-        return UserCommentAdminDto.builder()
-                .authorId(user.getId())
-                .authorName(user.getName())
-                .adminWarnCount(user.getAdminWarnings())
-                .bannedUntil(user.getBannedUntil() != null ? user.getBannedUntil().format(formatter) : null)
-                .build();
     }
 
     public static LogComment toLogComment(CommentDto comment) {

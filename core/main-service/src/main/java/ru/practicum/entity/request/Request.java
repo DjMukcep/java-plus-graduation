@@ -3,7 +3,6 @@ package ru.practicum.entity.request;
 import jakarta.persistence.*;
 import lombok.*;
 import ru.practicum.entity.event.Event;
-import ru.practicum.entity.user.User;
 
 import java.time.LocalDateTime;
 
@@ -25,9 +24,8 @@ public class Request {
     @JoinColumn(name = "event_id", nullable = false)
     private Event event;
 
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "requester_id", nullable = false)
-    private User user;
+    private Long requesterId;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

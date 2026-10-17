@@ -16,6 +16,15 @@ spring:
             - file:./infra/config-repo/core
             - file:./infra/config-repo/stats
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
 eureka:
   instance:
     prefer-ip-address: true

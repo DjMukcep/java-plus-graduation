@@ -17,13 +17,13 @@ public interface CompilationRepository extends JpaRepository<Compilation, Long>,
     boolean existsByTitle(String title);
 
     @NonNull
-    @EntityGraph(attributePaths = {"events", "events.category", "events.initiator"})
+    @EntityGraph(attributePaths = {"events", "events.category", "events.initiatorId"})
     Page<Compilation> findAll(@NonNull Pageable pageable);
 
     @NonNull
-    @EntityGraph(attributePaths = {"events", "events.category", "events.initiator"})
+    @EntityGraph(attributePaths = {"events", "events.category", "events.initiatorId"})
     Page<Compilation> findAll(@NonNull Predicate predicate, @NonNull Pageable pageable);
 
-    @EntityGraph(attributePaths = {"events", "events.category", "events.initiator"})
+    @EntityGraph(attributePaths = {"events", "events.category", "events.initiatorId"})
     Optional<Compilation> findWithEventsById(Long id);
 }

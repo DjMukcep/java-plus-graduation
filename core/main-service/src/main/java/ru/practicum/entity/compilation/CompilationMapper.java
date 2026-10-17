@@ -4,6 +4,8 @@ import lombok.experimental.UtilityClass;
 import ru.practicum.dto.compilation.CompilationDto;
 import ru.practicum.dto.compilation.LogCompilation;
 import ru.practicum.dto.compilation.NewCompilationDto;
+import ru.practicum.dto.user.UserDto;
+
 import ru.practicum.entity.event.Event;
 import ru.practicum.entity.event.EventMapper;
 
@@ -15,17 +17,20 @@ public class CompilationMapper {
 
     public static CompilationDto toDto(Compilation entity,
                                        Map<Long, Long> eventHits,
-                                       Map<Long, Long> eventRequestsCount) {
+                                       Map<Long, Long> eventRequestsCount,
+                                       Map<Long, UserDto> users) {
         return CompilationDto.builder()
                 .id(entity.getId())
                 .title(entity.getTitle())
                 .pinned(entity.getPinned())
                 .events(entity.getEvents().stream()
-                        .map(event -> EventMapper.toEventShortDto(
-                                event,
-                                eventRequestsCount.getOrDefault(event.getId(), 0L),
-                                eventHits.getOrDefault(event.getId(), 0L)
-                        ))
+                        .map(event ->
+                            EventMapper.toEventShortDto(
+                                    event,
+                                    eventRequestsCount.getOrDefault(event.getId(), 0L),
+                                    eventHits.getOrDefault(event.getId(), 0L),
+                                    users.get(event.getInitiatorId()))
+                        )
                         .collect(Collectors.toSet()))
                 .build();
     }

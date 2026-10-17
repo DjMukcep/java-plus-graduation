@@ -11,12 +11,17 @@ import ru.practicum.dto.compilation.CompilationDto;
 import ru.practicum.dto.compilation.CompilationsParamDto;
 import ru.practicum.dto.compilation.NewCompilationDto;
 import ru.practicum.dto.compilation.UpdateCompilationRequest;
+
+import ru.practicum.dto.user.UserDto;
+import ru.practicum.dto.user.UserParamDto;
 import ru.practicum.entity.event.Event;
 import ru.practicum.entity.event.EventService;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
+import ru.practicum.proxy.user.UserClient;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -26,6 +31,7 @@ import java.util.stream.Collectors;
 public class CompilationServiceImpl implements CompilationService {
 
     private final CompilationRepository compilationRepository;
+    private final UserClient userClient;
     private final EventService eventService;
 
     @Override
@@ -50,13 +56,27 @@ public class CompilationServiceImpl implements CompilationService {
                 .flatMap(Collection::stream)
                 .toList();
 
+        Map<Long, UserDto> users = getUsers(events);
         Map<Long, Long> hitsMap = eventService.getViewsMap(events);
         Map<Long, Long> eventsIdRequestsCount = eventService.getEventsRequests(events);
 
         return compilations.stream()
                 .map(compilation ->
-                        CompilationMapper.toDto(compilation, hitsMap, eventsIdRequestsCount))
+                        CompilationMapper.toDto(compilation, hitsMap, eventsIdRequestsCount,users))
                 .toList();
+    }
+
+    private Map<Long, UserDto> getUsers(List<Event> events) {
+        Set<Long> userIds = events.stream()
+                .map(Event::getInitiatorId)
+                .collect(Collectors.toSet());
+
+        UserParamDto userParamDto = new UserParamDto();
+        userParamDto.setIds(userIds);
+        userParamDto.setSize(userIds.size());
+
+        return userClient.getUsers(userParamDto).stream()
+                .collect(Collectors.toMap(UserDto::getId, Function.identity()));
     }
 
     @Override
@@ -66,10 +86,11 @@ public class CompilationServiceImpl implements CompilationService {
         List<Event> events = compilation.getEvents().stream()
                 .toList();
 
+        Map<Long, UserDto> users = getUsers(events);
         Map<Long, Long> hitsMap = eventService.getViewsMap(events);
         Map<Long, Long> eventsIdRequestsCount = eventService.getEventsRequests(events);
 
-        return CompilationMapper.toDto(compilation, hitsMap, eventsIdRequestsCount);
+        return CompilationMapper.toDto(compilation, hitsMap, eventsIdRequestsCount, users);
     }
 
     @Override
@@ -84,10 +105,11 @@ public class CompilationServiceImpl implements CompilationService {
         Compilation entity = CompilationMapper.toEntity(dto, new HashSet<>(events));
         entity = compilationRepository.save(entity);
 
+        Map<Long, UserDto> users = getUsers(events);
         Map<Long, Long> hitsMap = eventService.getViewsMap(events);
         Map<Long, Long> eventsIdRequestsCount = eventService.getEventsRequests(events);
 
-        var compilationDto = CompilationMapper.toDto(entity, hitsMap, eventsIdRequestsCount);
+        var compilationDto = CompilationMapper.toDto(entity, hitsMap, eventsIdRequestsCount, users);
         log.info("Новая подборка событий: {}", CompilationMapper.toLog(compilationDto));
 
         return compilationDto;
@@ -113,9 +135,10 @@ public class CompilationServiceImpl implements CompilationService {
         List<Event> events = compilation.getEvents().stream()
                 .toList();
 
+        Map<Long, UserDto> users = getUsers(events);
         Map<Long, Long> hitsMap = eventService.getViewsMap(events);
         Map<Long, Long> eventsIdRequestsCount = eventService.getEventsRequests(events);
-        var compilationDto = CompilationMapper.toDto(compilation, hitsMap, eventsIdRequestsCount);
+        var compilationDto = CompilationMapper.toDto(compilation, hitsMap, eventsIdRequestsCount, users);
         log.info("Подборка событий обновлена: {}", CompilationMapper.toLog(compilationDto));
 
         return compilationDto;

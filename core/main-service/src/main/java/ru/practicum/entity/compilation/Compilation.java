@@ -3,7 +3,6 @@ package ru.practicum.entity.compilation;
 import jakarta.persistence.*;
 import lombok.*;
 import ru.practicum.entity.event.Event;
-
 import java.util.HashSet;
 import java.util.Set;
 

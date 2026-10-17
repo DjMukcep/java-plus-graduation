@@ -27,7 +27,7 @@ spring:
         - id: main-service-admin
           uri: lb://main-service
           predicates:
-            - Path=/admin/categories,/admin/categories/**,/admin/comments,/admin/comments/**,/admin/compilations,/admin/compilations/**,/admin/events,/admin/events/**,/admin/users,/admin/users/**
+            - Path=/admin/categories,/admin/categories/**,/admin/comments,/admin/comments/**,/admin/compilations,/admin/compilations/**,/admin/events,/admin/events/**
           filters:
             - name: Retry
               args:
@@ -65,6 +65,24 @@ spring:
           predicates:
             - Path=/categories,/categories/**,/comments/**,/compilations,/compilations/**,/events,/events/**
             - Method=GET
+          filters:
+            - name: Retry
+              args:
+                retries: 2
+                statuses:
+                  - BAD_GATEWAY
+                  - SERVICE_UNAVAILABLE
+                  - GATEWAY_TIMEOUT
+                methods:
+                  - GET
+                backoff:
+                  firstBackoff: 100ms
+                  maxBackoff: 500ms
+
+        - id: user-service-admin
+          uri: lb://user-service
+          predicates:
+            - Path=/admin/users,/admin/users/**
           filters:
             - name: Retry
               args:

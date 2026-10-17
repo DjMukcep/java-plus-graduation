@@ -10,15 +10,15 @@ import java.util.Optional;
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
 
-    @EntityGraph(attributePaths = {"author","event"})
+    @EntityGraph(attributePaths = "event")
     Optional<Comment> findWithRelationsById(Long id);
 
-    @EntityGraph(attributePaths = {"author","event"})
+    @EntityGraph(attributePaths = "event")
     List<Comment> findAllByAuthorId(Long id);
 
-    @EntityGraph(attributePaths = {"author","event"})
+    @EntityGraph(attributePaths = "event")
     List<Comment> findAllByEventId(Long eventId);
 
-    @EntityGraph(attributePaths = {"author","event"})
+    @EntityGraph(attributePaths = "event")
     List<Comment> findAllByTextContainsIgnoreCase(String text, Pageable pageable);
 }
