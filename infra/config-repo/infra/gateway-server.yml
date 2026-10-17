@@ -27,7 +27,7 @@ spring:
         - id: main-service-admin
           uri: lb://main-service
           predicates:
-            - Path=/admin/categories,/admin/categories/**,/admin/comments,/admin/comments/**,/admin/compilations,/admin/compilations/**,/admin/events,/admin/events/**
+            - Path=/admin/categories,/admin/categories/**,/admin/compilations,/admin/compilations/**,/admin/events,/admin/events/**
           filters:
             - name: Retry
               args:
@@ -45,7 +45,7 @@ spring:
         - id: main-service-private
           uri: lb://main-service
           predicates:
-            - Path=/users/**
+            - Path=/users/*/events,/users/*/events/**,/users/*/requests,/users/*/requests/**
           filters:
             - name: Retry
               args:
@@ -63,7 +63,7 @@ spring:
         - id: main-service-public
           uri: lb://main-service
           predicates:
-            - Path=/categories,/categories/**,/comments/**,/compilations,/compilations/**,/events,/events/**
+            - Path=/categories,/categories/**,/compilations,/compilations/**,/events,/events/**
             - Method=GET
           filters:
             - name: Retry
@@ -83,6 +83,24 @@ spring:
           uri: lb://user-service
           predicates:
             - Path=/admin/users,/admin/users/**
+          filters:
+            - name: Retry
+              args:
+                retries: 2
+                statuses:
+                  - BAD_GATEWAY
+                  - SERVICE_UNAVAILABLE
+                  - GATEWAY_TIMEOUT
+                methods:
+                  - GET
+                backoff:
+                  firstBackoff: 100ms
+                  maxBackoff: 500ms
+
+        - id: comment-service-admin
+          uri: lb://comment-service
+          predicates:
+            - Path=/comments/**,/admin/comments/**,/users/*/comments,/users/*/comments/**
           filters:
             - name: Retry
               args:

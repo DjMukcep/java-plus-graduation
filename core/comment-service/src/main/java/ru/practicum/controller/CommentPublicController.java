@@ -1,4 +1,4 @@
-package ru.practicum.controller.public_api;
+package ru.practicum.controller;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Positive;
@@ -9,8 +9,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.dto.comment.CommentDto;
-import ru.practicum.entity.comment.CommentService;
+import ru.practicum.dto.CommentDto;
+import ru.practicum.service.CommentService;
 
 import java.util.List;
 

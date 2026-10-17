@@ -44,3 +44,18 @@ services:
       retries: 15
     ports:
       - "8542:5432"
+
+  ewm-comment-db:
+    image: postgres:16.1
+    container_name: postgres-ewm-comment-db
+    environment:
+      POSTGRES_USER: com
+      POSTGRES_PASSWORD: com
+      POSTGRES_DB: ewm-comment
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 10s
+      retries: 15
+    ports:
+      - "9542:5432"

@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
-import ru.practicum.dto.comment.UserCommentAdminDto;
 import ru.practicum.dto.user.UserDto;
 import ru.practicum.dto.user.UserParamDto;
 import ru.practicum.exception.UserServiceUnavailableException;
@@ -34,23 +33,8 @@ public class UserClientFallbackFactory implements FallbackFactory<UserClient> {
             }
 
             @Override
-            public UserCommentAdminDto getUserCommentStats(Long userId) {
-                throw handleFailure(cause,userId);
-            }
-
-            @Override
-            public UserCommentAdminDto setCommentsCount(Long userId, Integer commentsCount) {
-                throw handleFailure(cause,userId);
-            }
-
-            @Override
-            public UserCommentAdminDto setWarningToUser(Long userId) {
-                throw handleFailure(cause,userId);
-            }
-
-            @Override
             public List<UserDto> getUsers(UserParamDto userParamDto) {
-                log.warn("Ошибка при получении списка пользователей ids: {}", userParamDto.getIds());
+                log.error("Ошибка при получении списка пользователей ids: {}", userParamDto.getIds());
                 return List.of();
             }
 
@@ -60,7 +44,7 @@ public class UserClientFallbackFactory implements FallbackFactory<UserClient> {
                     throw feignException;
                 }
 
-                log.warn("Ошибка при обращении к user-service для userId={}: {}", userId, cause.getMessage());
+                log.error("Ошибка при обращении к user-service для userId={}: {}", userId, cause.getMessage());
 
                 return new UserServiceUnavailableException(userId, cause);
             }

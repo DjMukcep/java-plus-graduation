@@ -41,5 +41,7 @@ public interface EventService {
 
     Event findEventByIdAndState(Long id, EventState state);
 
-    boolean isEventExists(Long eventId);
+    boolean isEventExistsAndPublished(Long eventId);
+
+    boolean isEventExist(Long eventId);
 }

@@ -1,11 +1,11 @@
-package ru.practicum.entity.comment;
+package ru.practicum.service;
 
 import org.springframework.data.domain.Pageable;
-import ru.practicum.dto.comment.CommentDto;
-import ru.practicum.dto.comment.NewCommentDto;
-import ru.practicum.dto.comment.UpdateCommentDto;
+import ru.practicum.dto.CommentDto;
+import ru.practicum.dto.NewCommentDto;
+import ru.practicum.dto.UpdateCommentDto;
 import ru.practicum.dto.comment.UserCommentAdminDto;
-
+import ru.practicum.entity.Comment;
 import java.util.List;
 
 public interface CommentService {

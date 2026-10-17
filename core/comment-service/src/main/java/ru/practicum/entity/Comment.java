@@ -1,10 +1,9 @@
-package ru.practicum.entity.comment;
+package ru.practicum.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import ru.practicum.entity.event.Event;
 
 import java.time.LocalDateTime;
 
@@ -12,7 +11,6 @@ import java.time.LocalDateTime;
 @Table(name = "comments")
 @Getter
 @Setter
-//@ToString
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -25,9 +23,8 @@ public class Comment {
     @Column(nullable = false, length = 2000)
     private String text;
 
-    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id", nullable = false)
-    private Event event;
+    private Long eventId;
 
     @JoinColumn(name = "author_id", nullable = false)
     private Long authorId;

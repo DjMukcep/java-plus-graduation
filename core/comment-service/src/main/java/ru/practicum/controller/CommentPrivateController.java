@@ -1,4 +1,4 @@
-package ru.practicum.controller.private_api;
+package ru.practicum.controller;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;
@@ -6,10 +6,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.dto.comment.CommentDto;
-import ru.practicum.dto.comment.NewCommentDto;
-import ru.practicum.dto.comment.UpdateCommentDto;
-import ru.practicum.entity.comment.CommentService;
+import ru.practicum.dto.CommentDto;
+import ru.practicum.dto.NewCommentDto;
+import ru.practicum.dto.UpdateCommentDto;
+import ru.practicum.service.CommentService;
+
 
 import java.util.List;
 

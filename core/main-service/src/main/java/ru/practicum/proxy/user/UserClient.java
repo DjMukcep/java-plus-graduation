@@ -6,10 +6,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.cloud.openfeign.SpringQueryMap;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import ru.practicum.dto.comment.UserCommentAdminDto;
 import ru.practicum.dto.user.UserDto;
 import ru.practicum.dto.user.UserParamDto;
 
@@ -24,22 +21,6 @@ public interface UserClient {
 
     @GetMapping("/admin/users/{userId}/exists")
     void checkUserExists(@PathVariable @Positive Long userId);
-
-    //-------------comment-service---------//
-
-    @GetMapping("/admin/users/{userId}/comments")
-    UserCommentAdminDto getUserCommentStats(@PathVariable @Positive Long userId);
-
-    @PatchMapping("/admin/users/comments/{userId}")
-    UserCommentAdminDto setCommentsCount(
-            @PathVariable("userId") Long userId,
-            @RequestParam("commentsCount") Integer commentsCount
-    );
-
-    @PatchMapping("/admin/users/{userId}/warning")
-    UserCommentAdminDto setWarningToUser(@PathVariable @Positive Long userId);
-
-    //------------compilation-service--------//
 
     @GetMapping("/admin/users")
     List<UserDto> getUsers(@SpringQueryMap @Valid UserParamDto userParamDto);

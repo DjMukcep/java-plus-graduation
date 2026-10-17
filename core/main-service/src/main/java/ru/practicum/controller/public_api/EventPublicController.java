@@ -32,4 +32,16 @@ public class EventPublicController {
                                      HttpServletRequest request) {
         return eventService.getPublishedEventById(id, request);
     }
+
+    //-------------proxy---------------//
+
+    @GetMapping("/exists/published/{eventId}")
+    public boolean checkEventExistsAndPublished(@PathVariable @Positive Long eventId) {
+        return eventService.isEventExistsAndPublished(eventId);
+    }
+
+    @GetMapping("/exists/{eventId}")
+    public boolean checkEventExists(@PathVariable @Positive Long eventId) {
+        return eventService.isEventExist(eventId);
+    }
 }

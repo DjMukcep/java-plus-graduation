@@ -1,12 +1,12 @@
-package ru.practicum.entity.comment;
+package ru.practicum.mapper;
 
 import lombok.experimental.UtilityClass;
-import ru.practicum.dto.comment.CommentDto;
-import ru.practicum.dto.comment.LogComment;
-import ru.practicum.dto.comment.NewCommentDto;
 
+import ru.practicum.dto.CommentDto;
+import ru.practicum.dto.LogComment;
+import ru.practicum.dto.NewCommentDto;
 import ru.practicum.dto.user.UserDto;
-import ru.practicum.entity.event.Event;
+import ru.practicum.entity.Comment;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -17,11 +17,11 @@ public class CommentMapper {
 
     private static final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    public static Comment toComment(NewCommentDto comment, Long authorId, Event event) {
+    public static Comment toComment(NewCommentDto comment, Long authorId, Long eventId) {
         return Comment.builder()
                 .text(comment.getText())
                 .authorId(authorId)
-                .event(event)
+                .eventId(eventId)
                 .build();
     }
 
@@ -29,7 +29,7 @@ public class CommentMapper {
         return CommentDto.builder()
                 .id(comment.getId())
                 .authorId(comment.getAuthorId())
-                .eventId(comment.getEvent().getId())
+                .eventId(comment.getEventId())
                 .authorName(authorName)
                 .text(comment.getText())
                 .created(comment.getCreated().format(formatter))

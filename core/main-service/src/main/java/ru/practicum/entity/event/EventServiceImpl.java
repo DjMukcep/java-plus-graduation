@@ -402,8 +402,13 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public boolean isEventExists(Long eventId) {
-        return eventRepository.existsById(eventId);
+    public boolean isEventExistsAndPublished(Long eventId) {
+        return eventRepository.existsByIdAndState(eventId, EventState.PUBLISHED);
+    }
+
+    @Override
+    public boolean isEventExist(Long eventId) {
+        return eventRepository.existsById( eventId);
     }
 
     // ---------- QueryDSL predicates ----------

@@ -1,22 +1,24 @@
-package ru.practicum.entity.comment;
+package ru.practicum.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.dto.comment.CommentDto;
-import ru.practicum.dto.comment.NewCommentDto;
+import ru.practicum.dto.CommentDto;
+import ru.practicum.dto.NewCommentDto;
+import ru.practicum.dto.UpdateCommentDto;
 import ru.practicum.dto.comment.UserCommentAdminDto;
-import ru.practicum.dto.comment.UpdateCommentDto;
 import ru.practicum.dto.user.UserDto;
 import ru.practicum.dto.user.UserParamDto;
-import ru.practicum.entity.event.Event;
-import ru.practicum.entity.event.EventService;
-import ru.practicum.entity.event.EventState;
+
+import ru.practicum.entity.Comment;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
+import ru.practicum.mapper.CommentMapper;
+import ru.practicum.proxy.event.EventClient;
 import ru.practicum.proxy.user.UserClient;
+import ru.practicum.repository.CommentRepository;
 
 import java.util.Collections;
 import java.util.List;
@@ -33,7 +35,7 @@ public class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository;
     private final UserClient userClient;
-    private final EventService eventService;
+    private final EventClient eventClient;
 
 
     @Override
@@ -41,10 +43,14 @@ public class CommentServiceImpl implements CommentService {
     public CommentDto createComment(NewCommentDto newCommentDto, Long userId) {
         UserCommentAdminDto user = userClient.getUserCommentStats(userId);
         banCheck(user);
-        Event event = eventService.findEventByIdAndState(newCommentDto.getEventId(), EventState.PUBLISHED);
+        Long eventId = newCommentDto.getEventId();
+
+        if (!eventClient.checkEventExistsAndPublished(eventId)) {
+            throw new NotFoundException("Event not found eventId: " + newCommentDto.getEventId());
+        }
 
         user = userClient.setCommentsCount(user.getAuthorId(),user.getCommentCount() + 1);
-        Comment comment = commentRepository.save(CommentMapper.toComment(newCommentDto, user.getAuthorId(), event));
+        Comment comment = commentRepository.save(CommentMapper.toComment(newCommentDto, user.getAuthorId(), eventId));
         CommentDto commentDto = CommentMapper.toCommentDto(comment,user.getAuthorName());
 
         log.info("Новый комментарий на событие: {}", CommentMapper.toLogComment(commentDto));
@@ -117,7 +123,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public List<CommentDto> getEventComments(Long eventId) {
-        if (!eventService.isEventExists(eventId)) {
+        if (!eventClient.checkEventExists(eventId)) {
             throw new NotFoundException(String.format("Event id: %d not found.", eventId));
         }
         List<Comment> comments = commentRepository.findAllByEventId(eventId);
@@ -147,7 +153,7 @@ public class CommentServiceImpl implements CommentService {
 
     @Override
     public Comment getById(Long id) {
-        return commentRepository.findWithRelationsById(id).orElseThrow(
+        return commentRepository.findById(id).orElseThrow(
                 () -> new NotFoundException("Comment not found with id: " + id)
         );
     }

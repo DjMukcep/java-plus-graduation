@@ -1,15 +1,17 @@
-package ru.practicum.dto.comment;
+package ru.practicum.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class LogComment {
+@Builder
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class CommentDto {
     private Long id;
     private String text;
 
