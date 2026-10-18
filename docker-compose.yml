@@ -15,13 +15,28 @@ services:
     ports:
       - "6542:5432"
 
-  ewm-db:
+  request-db:
     image: postgres:16.1
-    container_name: postgres-ewm-main-db
+    container_name: postgres-ewm-request-db
+    environment:
+      POSTGRES_USER: request
+      POSTGRES_PASSWORD: request
+      POSTGRES_DB: ewm-request
+    healthcheck:
+      test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
+      timeout: 5s
+      interval: 10s
+      retries: 15
+    ports:
+      - "5542:5432"
+
+  ewm-event-db:
+    image: postgres:16.1
+    container_name: postgres-ewm-event-db
     environment:
       POSTGRES_USER: main
       POSTGRES_PASSWORD: main
-      POSTGRES_DB: ewm-main
+      POSTGRES_DB: ewm-event
     healthcheck:
       test: pg_isready -q -d $$POSTGRES_DB -U $$POSTGRES_USER
       timeout: 5s

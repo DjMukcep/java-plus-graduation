@@ -24,8 +24,8 @@ spring:
         locator:
           enabled: false
       routes:
-        - id: main-service-admin
-          uri: lb://main-service
+        - id: event-service-admin
+          uri: lb://event-service
           predicates:
             - Path=/admin/categories,/admin/categories/**,/admin/compilations,/admin/compilations/**,/admin/events,/admin/events/**
           filters:
@@ -42,10 +42,10 @@ spring:
                   firstBackoff: 100ms
                   maxBackoff: 500ms
 
-        - id: main-service-private
-          uri: lb://main-service
+        - id: event-service-private
+          uri: lb://event-service
           predicates:
-            - Path=/users/*/events,/users/*/events/**,/users/*/requests,/users/*/requests/**
+            - Path=/users/*/events,/users/*/events/**
           filters:
             - name: Retry
               args:
@@ -60,8 +60,8 @@ spring:
                   firstBackoff: 100ms
                   maxBackoff: 500ms
 
-        - id: main-service-public
-          uri: lb://main-service
+        - id: event-service-public
+          uri: lb://event-service
           predicates:
             - Path=/categories,/categories/**,/compilations,/compilations/**,/events,/events/**
             - Method=GET
@@ -79,7 +79,7 @@ spring:
                   firstBackoff: 100ms
                   maxBackoff: 500ms
 
-        - id: user-service-admin
+        - id: user-service
           uri: lb://user-service
           predicates:
             - Path=/admin/users,/admin/users/**
@@ -97,10 +97,28 @@ spring:
                   firstBackoff: 100ms
                   maxBackoff: 500ms
 
-        - id: comment-service-admin
+        - id: comment-service
           uri: lb://comment-service
           predicates:
             - Path=/comments/**,/admin/comments/**,/users/*/comments,/users/*/comments/**
+          filters:
+            - name: Retry
+              args:
+                retries: 2
+                statuses:
+                  - BAD_GATEWAY
+                  - SERVICE_UNAVAILABLE
+                  - GATEWAY_TIMEOUT
+                methods:
+                  - GET
+                backoff:
+                  firstBackoff: 100ms
+                  maxBackoff: 500ms
+
+        - id: request-service
+          uri: lb://request-service
+          predicates:
+            - Path=/users/*/requests,/users/*/requests/**
           filters:
             - name: Retry
               args:

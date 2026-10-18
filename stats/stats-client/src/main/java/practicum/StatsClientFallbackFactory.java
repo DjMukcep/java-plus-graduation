@@ -27,7 +27,7 @@ public class StatsClientFallbackFactory implements FallbackFactory<StatsClient> 
 
             @Override
             public List<ViewStats> getViewStats(StatsRequest request) {
-                log.warn("Stats service unavailable: {}", cause.getMessage(), cause);
+                log.error("Stats service unavailable: {}", cause.getMessage(), cause);
                 return Collections.emptyList();
             }
         };
