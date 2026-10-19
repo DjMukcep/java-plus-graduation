@@ -10,6 +10,6 @@ import java.util.Set;
 @AllArgsConstructor
 @Data
 public class StatusRequestsDto {
-    private Set<Long> eventIds;
+    private Set<Long> requestIds;
     private RequestStatus requestStatus;
 }

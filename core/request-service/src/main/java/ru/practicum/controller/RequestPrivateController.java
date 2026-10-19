@@ -53,9 +53,11 @@ public class RequestPrivateController {
     }
 
     @PatchMapping("/requests/status/update")
-    public ParticipationRequestDto updateStatus(
-            @ModelAttribute RequestStatusUpdate requestStatusUpdate) {
-        return RequestMapper.toRequestDto(requestService.updateStatus(requestStatusUpdate));
+    public List<ParticipationRequestDto> updateStatusRequests(
+            @ModelAttribute StatusRequestsDto statusRequestsDto) {
+        return RequestMapper.toRequestDto(requestService.updateStatusRequests(
+                statusRequestsDto.getRequestIds(), statusRequestsDto.getRequestStatus()
+        ));
     }
 
     @GetMapping("/requests/{eventId}/count")
@@ -68,6 +70,6 @@ public class RequestPrivateController {
     public List<EventRequestsCountDto> countByEventIdsAndStatus(
             @ModelAttribute StatusRequestsDto statusRequestsDto) {
         return requestService.countByEventIdsAndStatus(
-                statusRequestsDto.getEventIds(), statusRequestsDto.getRequestStatus());
+                statusRequestsDto.getRequestIds(), statusRequestsDto.getRequestStatus());
     }
 }

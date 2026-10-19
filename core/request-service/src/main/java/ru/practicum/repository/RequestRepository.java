@@ -1,6 +1,7 @@
 package ru.practicum.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import ru.practicum.dto.event.EventRequestsCountDto;
@@ -18,6 +19,8 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
 
     List<Request> findByRequesterId(Long userId);
 
+    List<Request> findByIdIn(Set<Long> ids);
+
     List<Request> findByIdInAndEventId(Set<Long> ids, Long eventId);
 
     List<Request> findByEventId(Long eventId);
@@ -29,4 +32,9 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
             "GROUP BY r.eventId")
     List<EventRequestsCountDto> countByEventIdInAndStatus(@Param("ids") Set<Long> ids,
                                                           @Param("status") RequestStatus status);
+
+    @Modifying
+    @Query("UPDATE Request r SET r.status = :status WHERE r.id IN :ids")
+    void updateStatusByIds(@Param("ids") Set<Long> ids,
+                           @Param("status") RequestStatus status);
 }

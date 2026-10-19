@@ -26,5 +26,5 @@ public interface RequestService {
 
     List<Request> getRequestsByEventId(Long eventId);
 
-    Request updateStatus(RequestStatusUpdate requestStatusUpdate);
+    List<Request> updateStatusRequests(Set<Long> ids, RequestStatus status);
 }

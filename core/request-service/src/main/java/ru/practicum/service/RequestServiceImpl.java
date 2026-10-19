@@ -102,11 +102,10 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     @Transactional
-    public Request updateStatus(RequestStatusUpdate requestStatusUpdate) {
-        Request request = getRequest(requestStatusUpdate.getRequestId());
-        request.setStatus(requestStatusUpdate.getRequestStatus());
+    public List<Request> updateStatusRequests(Set<Long> ids, RequestStatus status) {
+        requestRepository.updateStatusByIds(ids, status);
 
-        return request;
+        return requestRepository.findByIdIn(ids);
     }
 
     private boolean existsByUserIdAndEventId(Long userId, Long eventId) {

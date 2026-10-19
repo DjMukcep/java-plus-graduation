@@ -1,3 +1,8 @@
+resilience4j:
+  timelimiter:
+    instances:
+      RequestClientcountByEventIdAndStatusLongRequestStatus:
+        timeoutDuration: 5s
 spring:
   application:
     name: event-service

@@ -137,62 +137,115 @@ public class EventServiceImpl implements EventService {
 
     @Override
     @Transactional
-    public EventRequestStatusUpdateResult updateEventRequestsStatus(EventParamDto eventParamDto,
-                                                                    EventRequestStatusUpdateRequest request) {
+    public EventRequestStatusUpdateResult updateEventRequestsStatus(
+            EventParamDto eventParamDto,
+            EventRequestStatusUpdateRequest request) {
+
         Long userId = eventParamDto.getUserId();
         Long eventId = eventParamDto.getEventId();
+
         Event event = getEventById(eventId);
         userClient.checkUserExists(userId);
         checkUserIsEventInitiator(userId, event);
 
-        List<ParticipationRequestDto> requests = requestClient.getUserRequestsByUserIdsAndEventId(
-                new RequestParamDto(event.getId(),request.getRequestIds()));
+        List<ParticipationRequestDto> requests =
+                getRequestsForUpdate(eventId, request.getRequestIds());
 
-        long confirmedRequests = getEventRequestsCount(event.getId());
-        long remainedRequests = event.getParticipantLimit() - confirmedRequests;
+        long remainedRequests = getRemainedRequests(event);
 
-        RequestStatus targetStatus = request.getStatus();
+        validateConfirmationAllowed(event, request.getStatus(), remainedRequests);
 
-        if (targetStatus == RequestStatus.CONFIRMED) {
+        RequestsByStatus requestsByStatus =
+                distributeRequests(requests, request.getStatus(), remainedRequests);
 
-            if (event.getParticipantLimit() == 0 || !event.getRequestModeration()) {
-                throw new ConflictException("Confirmation is not required or allowed for this event configuration.");
-            }
+        List<ParticipationRequestDto> rejected =
+                updateRequestsStatus(requestsByStatus.rejected());
 
-            if (remainedRequests <= 0L) {
-                throw new ConflictException("The participant limit has been reached");
-            }
-        }
-
-        List<ParticipationRequestDto> confirmed = new ArrayList<>();
-        List<ParticipationRequestDto> rejected = new ArrayList<>();
-
-        for (ParticipationRequestDto req : requests) {
-            if (!req.getStatus().equalsIgnoreCase(RequestStatus.PENDING.name())) {
-                throw new ConflictException(String.format("Request must have status PENDING. " +
-                        "Request with id=" + req.getId() + " has status " + req.getStatus()));
-            }
-
-            if (targetStatus == RequestStatus.REJECTED) {
-                var requestDto = requestClient.updateStatus(new RequestStatusUpdate(req.getId(), RequestStatus.REJECTED));
-                rejected.add(requestDto);
-                continue;
-            }
-
-            if (remainedRequests <= 0L) {
-                var requestDto = requestClient.updateStatus(new RequestStatusUpdate(req.getId(), RequestStatus.REJECTED));
-                rejected.add(requestDto);
-                continue;
-            }
-            var requestDto = requestClient.updateStatus(new RequestStatusUpdate(req.getId(), RequestStatus.CONFIRMED));
-            confirmed.add(requestDto);
-            remainedRequests--;
-        }
+        List<ParticipationRequestDto> confirmed =
+                updateRequestsStatus(requestsByStatus.confirmed());
 
         var result = new EventRequestStatusUpdateResult(confirmed, rejected);
+
         log.info("Обновлены статусы заявок на событие: {}", result);
 
         return result;
+    }
+
+    private List<ParticipationRequestDto> getRequestsForUpdate(
+            Long eventId, Set<Long> requestIds) {
+
+        return requestClient.getUserRequestsByUserIdsAndEventId(
+                new RequestParamDto(eventId, requestIds));
+    }
+
+    private long getRemainedRequests(Event event) {
+        return event.getParticipantLimit() - getEventRequestsCount(event.getId());
+    }
+
+    private void validateConfirmationAllowed(
+            Event event, RequestStatus targetStatus, long remainedRequests) {
+
+        if (targetStatus != RequestStatus.CONFIRMED) {
+            return;
+        }
+
+        if (event.getParticipantLimit() == 0 || !event.getRequestModeration()) {
+            throw new ConflictException(
+                    "Confirmation is not required or allowed for this event configuration.");
+        }
+
+        if (remainedRequests <= 0L) {
+            throw new ConflictException("The participant limit has been reached");
+        }
+    }
+
+    private record RequestsByStatus(
+            StatusRequestsDto confirmed,
+            StatusRequestsDto rejected) {
+    }
+
+    private RequestsByStatus distributeRequests(
+            List<ParticipationRequestDto> requests,
+            RequestStatus targetStatus,
+            long remainedRequests) {
+
+        var confirmed = new StatusRequestsDto(
+                new HashSet<>(), RequestStatus.CONFIRMED);
+
+        var rejected = new StatusRequestsDto(
+                new HashSet<>(), RequestStatus.REJECTED);
+
+        for (ParticipationRequestDto request : requests) {
+            validatePendingStatus(request);
+
+            if (targetStatus == RequestStatus.REJECTED || remainedRequests <= 0L) {
+                rejected.getRequestIds().add(request.getId());
+            } else {
+                confirmed.getRequestIds().add(request.getId());
+                remainedRequests--;
+            }
+        }
+
+        return new RequestsByStatus(confirmed, rejected);
+    }
+
+    private void validatePendingStatus(ParticipationRequestDto request) {
+        if (!request.getStatus().equalsIgnoreCase(RequestStatus.PENDING.name())) {
+            throw new ConflictException(String.format(
+                    "Request must have status PENDING. Request with id=%d has status %s",
+                    request.getId(),
+                    request.getStatus()));
+        }
+    }
+
+    private List<ParticipationRequestDto> updateRequestsStatus(
+            StatusRequestsDto requests) {
+
+        if (requests.getRequestIds().isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        return requestClient.updateStatusRequests(requests);
     }
 
     // ---------- Admin ----------

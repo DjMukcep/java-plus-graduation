@@ -24,7 +24,7 @@ public interface RequestClient {
     List<ParticipationRequestDto> getUserRequestsByEventId(@PathVariable @Positive Long eventId);
 
     @PatchMapping("/users/requests/status/update")
-    ParticipationRequestDto updateStatus(@SpringQueryMap RequestStatusUpdate requestStatusUpdate);
+    List<ParticipationRequestDto> updateStatusRequests(@SpringQueryMap StatusRequestsDto statusRequestsDto);
 
     @GetMapping("/users/requests/{eventId}/count")
     long countByEventIdAndStatus(@PathVariable @Positive Long eventId,

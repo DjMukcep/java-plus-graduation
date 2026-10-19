@@ -1,6 +1,5 @@
 package ru.practicum.proxy.request;
 
-import feign.FeignException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.openfeign.FallbackFactory;
@@ -22,72 +21,39 @@ public class RequestClientFallbackFactory implements FallbackFactory<RequestClie
 
             @Override
             public List<ParticipationRequestDto> getUserRequestsByUserIdsAndEventId(RequestParamDto requestDto) {
-                if (cause instanceof FeignException feignException
-                        && (feignException.status() == 404
-                        || feignException.status() == 409)) {
-
-                    throw feignException;
-                }
-
                 log.error("Request service is unavailable for eventId={}", requestDto.getEventId(), cause);
 
-                throw new RequestServiceUnavailableException(requestDto.getEventId().toString(), cause);
+                return List.of();
             }
 
             @Override
             public List<ParticipationRequestDto> getUserRequestsByEventId(Long eventId) {
-                if (cause instanceof FeignException feignException
-                        && (feignException.status() == 404
-                        || feignException.status() == 409)) {
-
-                    throw feignException;
-                }
-
                 log.error("Request service is unavailable for eventId={}", eventId, cause);
 
-                throw new RequestServiceUnavailableException(eventId.toString(), cause);
+                return List.of();
             }
 
             @Override
-            public ParticipationRequestDto updateStatus(RequestStatusUpdate requestStatusUpdate) {
-                if (cause instanceof FeignException feignException
-                        && (feignException.status() == 404
-                        || feignException.status() == 409)) {
+            public List<ParticipationRequestDto> updateStatusRequests(StatusRequestsDto statusRequestsDto) {
+                log.error("Request service is unavailable for requestIds={}",
+                        statusRequestsDto.getRequestIds(), cause);
 
-                    throw feignException;
-                }
-
-                log.error("Request service is unavailable for requestId={}", requestStatusUpdate.getRequestId(), cause);
-
-                throw new RequestServiceUnavailableException(requestStatusUpdate.getRequestId().toString(), cause);
+                throw new RequestServiceUnavailableException(
+                        statusRequestsDto.getRequestIds().toString(), cause);
             }
 
             @Override
             public long countByEventIdAndStatus(Long eventId, RequestStatus status) {
-                if (cause instanceof FeignException feignException
-                        && (feignException.status() == 404
-                        || feignException.status() == 409)) {
-
-                    throw feignException;
-                }
-
                 log.error("Request service is unavailable for eventId={}", eventId, cause);
 
-                throw new RequestServiceUnavailableException(eventId.toString(), cause);
+                return 0;
             }
 
             @Override
             public List<EventRequestsCountDto> countByEventIdsAndStatus(StatusRequestsDto statusRequestsDto) {
-                if (cause instanceof FeignException feignException
-                        && (feignException.status() == 404
-                        || feignException.status() == 409)) {
+                log.error("Request service is unavailable for eventIds={}", statusRequestsDto.getRequestIds(), cause);
 
-                    throw feignException;
-                }
-
-                log.error("Request service is unavailable for eventIds={}", statusRequestsDto.getEventIds(), cause);
-
-                throw new RequestServiceUnavailableException(statusRequestsDto.getEventIds().toString(), cause);
+                return List.of();
             }
         };
     }

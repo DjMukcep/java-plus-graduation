@@ -45,7 +45,7 @@ public class UserClientFallbackFactory implements FallbackFactory<UserClient> {
 
             private UserServiceUnavailableException handleFailure(Throwable cause, Long userId) {
                 if (cause instanceof FeignException feignException
-                        && feignException.status() == 404) {
+                        && feignException.status() == 503) {
                     throw feignException;
                 }
 
