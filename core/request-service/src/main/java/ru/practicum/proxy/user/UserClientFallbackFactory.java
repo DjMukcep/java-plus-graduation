@@ -38,7 +38,7 @@ public class UserClientFallbackFactory implements FallbackFactory<UserClient> {
 
                 log.error("Ошибка при обращении к user-service для userId={}: {}", userId, cause.getMessage());
 
-                return new UserServiceUnavailableException(userId, cause);
+                return new UserServiceUnavailableException("User service is unavailable for userId=" + userId);
             }
 
         };
