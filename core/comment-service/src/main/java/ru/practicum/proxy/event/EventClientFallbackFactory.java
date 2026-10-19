@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
+import ru.practicum.exception.EventServiceUnavailableException;
 
 @Component
 public class EventClientFallbackFactory implements FallbackFactory<EventClient> {
@@ -18,21 +19,23 @@ public class EventClientFallbackFactory implements FallbackFactory<EventClient> 
 
             @Override
             public boolean checkEventExistsAndPublished(Long eventId) {
-                handleFailure(cause,eventId);
-                return false;
+                throw handleFailure(cause,eventId);
             }
 
             @Override
             public boolean checkEventExists(Long eventId) {
-                handleFailure(cause,eventId);
-                return false;
+                throw handleFailure(cause,eventId);
+
             }
 
-            private void handleFailure(Throwable cause, Long eventId) {
+            private EventServiceUnavailableException handleFailure(Throwable cause, Long eventId) {
                 if (cause instanceof FeignException feignException
                         && feignException.status() == 503) {
-                    log.error("Ошибка при обращении к main-service для eventId={}: {}", eventId, cause.getMessage());
+                    log.error("Ошибка при обращении к event-service для eventId={}. Cause: {}",
+                            eventId, cause.getMessage());
                 }
+
+                return new EventServiceUnavailableException("Event service is unavailable for event-id=" + eventId);
             }
         };
     }

@@ -21,39 +21,42 @@ public class RequestClientFallbackFactory implements FallbackFactory<RequestClie
 
             @Override
             public List<ParticipationRequestDto> getUserRequestsByUserIdsAndEventId(RequestParamDto requestDto) {
-                log.error("Request service is unavailable for eventId={}", requestDto.getEventId(), cause);
-
+                logError(requestDto.getEventId(),  cause);
                 return List.of();
             }
 
             @Override
             public List<ParticipationRequestDto> getUserRequestsByEventId(Long eventId) {
-                log.error("Request service is unavailable for eventId={}", eventId, cause);
-
+                logError(eventId,cause);
                 return List.of();
             }
 
             @Override
             public List<ParticipationRequestDto> updateStatusRequests(StatusRequestsDto statusRequestsDto) {
-                log.error("Request service is unavailable for requestIds={}",
-                        statusRequestsDto.getRequestIds(), cause);
+                log.error("Request service is unavailable for requestIds={}. Cause: {}",
+                        statusRequestsDto.getRequestIds(), cause.getMessage());
 
                 throw new RequestServiceUnavailableException(
-                        statusRequestsDto.getRequestIds().toString(), cause);
+                        "Request service is unavailable for eventIds=" + statusRequestsDto.getRequestIds());
             }
 
             @Override
             public long countByEventIdAndStatus(Long eventId, RequestStatus status) {
-                log.error("Request service is unavailable for eventId={}", eventId, cause);
-
+                logError(eventId,cause);
                 return 0;
             }
 
             @Override
             public List<EventRequestsCountDto> countByEventIdsAndStatus(StatusRequestsDto statusRequestsDto) {
-                log.error("Request service is unavailable for eventIds={}", statusRequestsDto.getRequestIds(), cause);
+                log.error("Request service is unavailable for eventIds={}. Cause: {}",
+                        statusRequestsDto.getRequestIds(), cause.getMessage());
 
                 return List.of();
+            }
+
+            private void logError(Long eventId, Throwable cause) {
+                log.error("Request service is unavailable for eventId={}. Cause: {}",
+                        eventId, cause.getMessage());
             }
         };
     }

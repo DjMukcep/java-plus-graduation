@@ -21,7 +21,6 @@ public class UserClientFallbackFactory implements FallbackFactory<UserClient> {
     public UserClient create(Throwable cause) {
         return new  UserClient() {
 
-
             @Override
             public UserDto getUserById(Long userId) {
                 throw handleFailure(cause,userId);
@@ -34,7 +33,8 @@ public class UserClientFallbackFactory implements FallbackFactory<UserClient> {
 
             @Override
             public List<UserDto> getUsers(UserParamDto userParamDto) {
-                log.error("Ошибка при получении списка пользователей ids: {}", userParamDto.getIds());
+                log.error("Ошибка при получении списка пользователей ids: {}. Cause: {}",
+                        userParamDto.getIds(), cause.getMessage());
                 return List.of();
             }
 
@@ -44,9 +44,9 @@ public class UserClientFallbackFactory implements FallbackFactory<UserClient> {
                     throw feignException;
                 }
 
-                log.error("Ошибка при обращении к user-service для userId={}: {}", userId, cause.getMessage());
+                log.error("Ошибка при обращении к user-service для userId={}. Cause: {}", userId, cause.getMessage());
 
-                return new UserServiceUnavailableException(userId, cause);
+                return new UserServiceUnavailableException("User service is unavailable for userId=" + userId);
             }
 
         };

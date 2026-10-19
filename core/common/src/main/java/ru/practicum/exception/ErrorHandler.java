@@ -141,4 +141,46 @@ public class ErrorHandler {
                 .timestamp(LocalDateTime.now().format(formatter))
                 .build();
     }
+
+    @ExceptionHandler(RequestServiceUnavailableException.class)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    public ApiError handleRequestServiceUnavailable(
+            final RequestServiceUnavailableException e) {
+        log.error("Сервис заявок недоступен: {}", e.getMessage());
+
+        return ApiError.builder()
+                .message(e.getMessage())
+                .reason("Dependent request-service is unavailable.")
+                .status(HttpStatus.SERVICE_UNAVAILABLE.name())
+                .timestamp(LocalDateTime.now().format(formatter))
+                .build();
+    }
+
+    @ExceptionHandler(UserServiceUnavailableException.class)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    public ApiError handleUserServiceUnavailable(
+            final RequestServiceUnavailableException e) {
+        log.error("Сервис пользователей недоступен");
+
+        return ApiError.builder()
+                .message(e.getMessage())
+                .reason("Dependent user-service is unavailable.")
+                .status(HttpStatus.SERVICE_UNAVAILABLE.name())
+                .timestamp(LocalDateTime.now().format(formatter))
+                .build();
+    }
+
+    @ExceptionHandler(EventServiceUnavailableException.class)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    public ApiError handleEventServiceUnavailable(
+            final RequestServiceUnavailableException e) {
+        log.error("Сервис мероприятий недоступен");
+
+        return ApiError.builder()
+                .message(e.getMessage())
+                .reason("Dependent event-service is unavailable.")
+                .status(HttpStatus.SERVICE_UNAVAILABLE.name())
+                .timestamp(LocalDateTime.now().format(formatter))
+                .build();
+    }
 }
