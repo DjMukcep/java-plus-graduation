@@ -17,13 +17,12 @@ eureka:
   client:
     serviceUrl:
       defaultZone: http://localhost:8761/eureka/
+    registry-fetch-interval-seconds: 5
 
 logging:
   level:
     ru.yandex.practicum.telemetry: WARN
     org.springframework: ERROR
-    org.springframework.cloud.loadbalancer: DEBUG
-    com.netflix.discovery: DEBUG
 
   pattern:
     console: "%clr(%d{yyyy-MM-dd'T'HH:mm:ss.SSSXXX}){faint} %clr(%5p) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %clr([requestId=%X{requestId:-N/A}]){yellow} %m%n"

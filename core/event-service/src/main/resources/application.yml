@@ -1,0 +1,22 @@
+resilience4j:
+  timelimiter:
+    instances:
+      RequestClientcountByEventIdAndStatusLongRequestStatus:
+        timeoutDuration: 5s
+spring:
+  application:
+    name: event-service
+  config:
+    import: "optional:configserver:"
+  cloud:
+    config:
+      discovery:
+        enabled: true
+        service-id: config-server
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:8761/eureka/

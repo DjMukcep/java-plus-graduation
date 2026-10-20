@@ -24,10 +24,10 @@ spring:
         locator:
           enabled: false
       routes:
-        - id: main-service-admin
-          uri: lb://main-service
+        - id: event-service-admin
+          uri: lb://event-service
           predicates:
-            - Path=/admin/categories,/admin/categories/**,/admin/comments,/admin/comments/**,/admin/compilations,/admin/compilations/**,/admin/events,/admin/events/**,/admin/users,/admin/users/**
+            - Path=/admin/categories,/admin/categories/**,/admin/compilations,/admin/compilations/**,/admin/events,/admin/events/**
           filters:
             - name: Retry
               args:
@@ -42,10 +42,10 @@ spring:
                   firstBackoff: 100ms
                   maxBackoff: 500ms
 
-        - id: main-service-private
-          uri: lb://main-service
+        - id: event-service-private
+          uri: lb://event-service
           predicates:
-            - Path=/users/**
+            - Path=/users/*/events,/users/*/events/**
           filters:
             - name: Retry
               args:
@@ -60,11 +60,97 @@ spring:
                   firstBackoff: 100ms
                   maxBackoff: 500ms
 
-        - id: main-service-public
-          uri: lb://main-service
+        - id: event-service-internal-block
+          uri: no://op
           predicates:
-            - Path=/categories,/categories/**,/comments/**,/compilations,/compilations/**,/events,/events/**
+            - Path=/events/exists/**
             - Method=GET
+          filters:
+            - SetStatus=404
+
+        - id: event-service-public
+          uri: lb://event-service
+          predicates:
+            - Path=/categories,/categories/**,/compilations,/compilations/**,/events,/events/**
+            - Method=GET
+          filters:
+            - name: Retry
+              args:
+                retries: 2
+                statuses:
+                  - BAD_GATEWAY
+                  - SERVICE_UNAVAILABLE
+                  - GATEWAY_TIMEOUT
+                methods:
+                  - GET
+                backoff:
+                  firstBackoff: 100ms
+                  maxBackoff: 500ms
+
+        - id: user-service-internal-get-block
+          uri: no://op
+          predicates:
+            - Path=/admin/users/*/exists,/admin/users/*/comments,/admin/users/*
+            - Method=GET
+          filters:
+            - SetStatus=404
+
+        - id: user-service-internal-patch-block
+          uri: no://op
+          predicates:
+            - Path=/admin/users/comments/**,/admin/users/*/warning
+            - Method=PATCH
+          filters:
+            - SetStatus=404
+
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/admin/users,/admin/users/**
+          filters:
+            - name: Retry
+              args:
+                retries: 2
+                statuses:
+                  - BAD_GATEWAY
+                  - SERVICE_UNAVAILABLE
+                  - GATEWAY_TIMEOUT
+                methods:
+                  - GET
+                backoff:
+                  firstBackoff: 100ms
+                  maxBackoff: 500ms
+
+        - id: comment-service
+          uri: lb://comment-service
+          predicates:
+            - Path=/comments/**,/admin/comments/**,/users/*/comments,/users/*/comments/**
+          filters:
+            - name: Retry
+              args:
+                retries: 2
+                statuses:
+                  - BAD_GATEWAY
+                  - SERVICE_UNAVAILABLE
+                  - GATEWAY_TIMEOUT
+                methods:
+                  - GET
+                backoff:
+                  firstBackoff: 100ms
+                  maxBackoff: 500ms
+
+        - id: request-service-internal-block
+          uri: no://op
+          predicates:
+            - Path=/users/requests,/users/requests/**,/users/requests/count
+            - Method=GET,PATCH
+          filters:
+            - SetStatus=404
+
+        - id: request-service
+          uri: lb://request-service
+          predicates:
+            - Path=/users/*/requests,/users/*/requests/**
           filters:
             - name: Retry
               args:
