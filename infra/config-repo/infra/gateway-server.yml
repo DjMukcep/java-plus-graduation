@@ -60,6 +60,14 @@ spring:
                   firstBackoff: 100ms
                   maxBackoff: 500ms
 
+        - id: event-service-internal-block
+          uri: no://op
+          predicates:
+            - Path=/events/exists/**
+            - Method=GET
+          filters:
+            - SetStatus=404
+
         - id: event-service-public
           uri: lb://event-service
           predicates:
@@ -78,6 +86,22 @@ spring:
                 backoff:
                   firstBackoff: 100ms
                   maxBackoff: 500ms
+
+        - id: user-service-internal-get-block
+          uri: no://op
+          predicates:
+            - Path=/admin/users/*/exists,/admin/users/*/comments,/admin/users/*
+            - Method=GET
+          filters:
+            - SetStatus=404
+
+        - id: user-service-internal-patch-block
+          uri: no://op
+          predicates:
+            - Path=/admin/users/comments/**,/admin/users/*/warning
+            - Method=PATCH
+          filters:
+            - SetStatus=404
 
         - id: user-service
           uri: lb://user-service
@@ -114,6 +138,14 @@ spring:
                 backoff:
                   firstBackoff: 100ms
                   maxBackoff: 500ms
+
+        - id: request-service-internal-block
+          uri: no://op
+          predicates:
+            - Path=/users/requests,/users/requests/**,/users/requests/count
+            - Method=GET,PATCH
+          filters:
+            - SetStatus=404
 
         - id: request-service
           uri: lb://request-service

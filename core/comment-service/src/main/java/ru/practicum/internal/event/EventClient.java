@@ -1,4 +1,4 @@
-package ru.practicum.proxy.event;
+package ru.practicum.internal.event;
 
 import jakarta.validation.constraints.Positive;
 import org.springframework.cloud.openfeign.FeignClient;

@@ -68,7 +68,9 @@
 ## Внешний API
 
 Внешний API предоставляет клиентам доступ к функциям приложения через HTTP-запросы.
-**Спецификация внешнего API:** Спецификации API представлены в формате JSON в файлах `spec.json`.
+
+- [Main Service API](ewm-main-service-spec.json)
+- [Stats Service API](ewm-stats-service-spec.json)
 
 ### Категории (`event-service`)
 

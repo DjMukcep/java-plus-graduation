@@ -1,4 +1,4 @@
-package ru.practicum.proxy.request;
+package ru.practicum.internal.request;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;

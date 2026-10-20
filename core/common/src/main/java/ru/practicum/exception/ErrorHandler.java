@@ -159,7 +159,7 @@ public class ErrorHandler {
     @ExceptionHandler(UserServiceUnavailableException.class)
     @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
     public ApiError handleUserServiceUnavailable(
-            final RequestServiceUnavailableException e) {
+            final UserServiceUnavailableException e) {
         log.error("Сервис пользователей недоступен");
 
         return ApiError.builder()
@@ -173,7 +173,7 @@ public class ErrorHandler {
     @ExceptionHandler(EventServiceUnavailableException.class)
     @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
     public ApiError handleEventServiceUnavailable(
-            final RequestServiceUnavailableException e) {
+            final EventServiceUnavailableException e) {
         log.error("Сервис мероприятий недоступен");
 
         return ApiError.builder()

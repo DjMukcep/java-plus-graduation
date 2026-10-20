@@ -1,4 +1,4 @@
-package ru.practicum.proxy.user;
+package ru.practicum.internal.user;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Positive;

@@ -4,7 +4,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import practicum.StatsClientConfig;
 import org.springframework.context.annotation.Import;
-import ru.practicum.proxy.config.UserClientConfig;
+import ru.practicum.internal.config.UserClientConfig;
 
 
 @Import({StatsClientConfig.class, UserClientConfig.class})

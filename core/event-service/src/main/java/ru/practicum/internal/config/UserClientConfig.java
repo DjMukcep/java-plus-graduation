@@ -1,12 +1,12 @@
-package ru.practicum.proxy.config;
+package ru.practicum.internal.config;
 
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import ru.practicum.proxy.request.RequestClient;
-import ru.practicum.proxy.request.RequestClientFallbackFactory;
-import ru.practicum.proxy.user.UserClient;
-import ru.practicum.proxy.user.UserClientFallbackFactory;
+import ru.practicum.internal.request.RequestClient;
+import ru.practicum.internal.request.RequestClientFallbackFactory;
+import ru.practicum.internal.user.UserClient;
+import ru.practicum.internal.user.UserClientFallbackFactory;
 
 @Configuration
 @EnableFeignClients(clients = {UserClient.class, RequestClient.class})

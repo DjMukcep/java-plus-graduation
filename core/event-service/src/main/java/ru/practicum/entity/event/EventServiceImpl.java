@@ -28,8 +28,8 @@ import ru.practicum.entity.category.CategoryService;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.exception.ValidationException;
-import ru.practicum.proxy.request.RequestClient;
-import ru.practicum.proxy.user.UserClient;
+import ru.practicum.internal.request.RequestClient;
+import ru.practicum.internal.user.UserClient;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

@@ -1,4 +1,4 @@
-package ru.practicum.proxy.user;
+package ru.practicum.internal.user;
 
 
 import feign.FeignException;
@@ -16,7 +16,7 @@ import java.util.List;
 @Component
 public class UserClientFallbackFactory implements FallbackFactory<UserClient> {
 
-    private final static Logger log = LoggerFactory.getLogger(UserClientFallbackFactory.class);
+    private static final Logger log = LoggerFactory.getLogger(UserClientFallbackFactory.class);
 
     @Override
     public UserClient create(Throwable cause) {

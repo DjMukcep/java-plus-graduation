@@ -1,4 +1,4 @@
-package ru.practicum.proxy.request;
+package ru.practicum.internal.request;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,7 +13,7 @@ import java.util.List;
 @Component
 public class RequestClientFallbackFactory implements FallbackFactory<RequestClient> {
 
-    private final static Logger log = LoggerFactory.getLogger(RequestClientFallbackFactory.class);
+    private static final Logger log = LoggerFactory.getLogger(RequestClientFallbackFactory.class);
 
     @Override
     public RequestClient create(Throwable cause) {

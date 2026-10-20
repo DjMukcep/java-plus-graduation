@@ -16,8 +16,8 @@ import ru.practicum.entity.Comment;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.mapper.CommentMapper;
-import ru.practicum.proxy.event.EventClient;
-import ru.practicum.proxy.user.UserClient;
+import ru.practicum.internal.event.EventClient;
+import ru.practicum.internal.user.UserClient;
 import ru.practicum.repository.CommentRepository;
 
 import java.util.Collections;

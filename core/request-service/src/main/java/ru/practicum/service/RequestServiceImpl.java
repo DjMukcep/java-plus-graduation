@@ -10,7 +10,6 @@ import ru.practicum.dto.event.EventRequestsCountDto;
 import ru.practicum.dto.event.EventState;
 import ru.practicum.dto.request.ParticipationRequestDto;
 import ru.practicum.dto.request.RequestParamDto;
-import ru.practicum.dto.request.RequestStatusUpdate;
 import ru.practicum.dto.user.UserDto;
 
 import ru.practicum.entity.Request;
@@ -19,8 +18,8 @@ import ru.practicum.dto.request.RequestStatus;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.mapper.RequestMapper;
-import ru.practicum.proxy.event.EventClient;
-import ru.practicum.proxy.user.UserClient;
+import ru.practicum.internal.event.EventClient;
+import ru.practicum.internal.user.UserClient;
 import ru.practicum.repository.RequestRepository;
 
 import java.util.List;

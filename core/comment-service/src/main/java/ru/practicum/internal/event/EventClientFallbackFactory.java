@@ -1,4 +1,4 @@
-package ru.practicum.proxy.event;
+package ru.practicum.internal.event;
 
 import feign.FeignException;
 import org.slf4j.Logger;
@@ -10,7 +10,7 @@ import ru.practicum.exception.EventServiceUnavailableException;
 @Component
 public class EventClientFallbackFactory implements FallbackFactory<EventClient> {
 
-    private final static Logger log = LoggerFactory.getLogger(EventClientFallbackFactory.class);
+    private static final Logger log = LoggerFactory.getLogger(EventClientFallbackFactory.class);
 
     @Override
     public EventClient create(Throwable cause) {

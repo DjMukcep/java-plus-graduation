@@ -18,7 +18,7 @@ import ru.practicum.entity.event.Event;
 import ru.practicum.entity.event.EventService;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
-import ru.practicum.proxy.user.UserClient;
+import ru.practicum.internal.user.UserClient;
 
 import java.util.*;
 import java.util.function.Function;
