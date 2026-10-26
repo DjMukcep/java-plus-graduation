@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import ru.practicum.CollectorClient;
 import ru.practicum.dto.event.EventDto;
 import ru.practicum.dto.event.EventRequestsCountDto;
 import ru.practicum.dto.event.EventState;
@@ -32,8 +33,10 @@ import java.util.Set;
 public class RequestServiceImpl implements RequestService {
 
     private final RequestRepository requestRepository;
-    private final EventClient eventClient;
+    private final CollectorClient collectorClient;
     private final UserClient userClient;
+    private final EventClient eventClient;
+
 
     @Override
     @Transactional
@@ -47,6 +50,7 @@ public class RequestServiceImpl implements RequestService {
         checkUserRequestForEvent(event, userId);
 
         Request request = RequestMapper.toRequest(event, user);
+        collectorClient.collectUserAction(userId,eventId,"ACTION_REGISTER");
         request = requestRepository.save(request);
 
         var requestDto = RequestMapper.toRequestDto(request);

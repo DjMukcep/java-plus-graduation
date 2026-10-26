@@ -15,11 +15,6 @@ public interface EventService {
 
     EventFullDto updateEventByAdmin(Long eventId, UpdateEventAdminRequest request);
 
-    // Public
-    List<EventShortDto> getPublishedEvents(EventPublicParamDto params, HttpServletRequest request);
-
-    EventFullDto getPublishedEventById(Long id, HttpServletRequest request);
-
     // Private
     EventFullDto create(Long userId, NewEventDto dto);
 
@@ -37,13 +32,25 @@ public interface EventService {
 
     Map<Long, Long> getEventsRequests(List<Event> events);
 
-    Map<Long, Long> getViewsMap(List<Event> events);
+    Map<Long, Double> getEventRatings(List<Event> events);
 
     Event findEventByIdAndState(Long id, EventState state);
 
+    Event getEventById(Long eventId);
+
+    // Public
+    List<EventShortDto> getPublishedEvents(EventPublicParamDto params, HttpServletRequest request);
+
+    EventFullDto getPublishedEventById(Long id, Long userId);
+
+    List<RecommendedEvent> getRecommendedEvents(Long userId, Integer maxResults);
+
+    void likeEvent(Long eventId, Long userId);
+
+    // Internal
     boolean isEventExistsAndPublished(Long eventId);
 
     boolean isEventExist(Long eventId);
 
-    Event getEventById(Long eventId);
+
 }

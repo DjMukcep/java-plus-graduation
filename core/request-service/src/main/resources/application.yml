@@ -2,7 +2,7 @@ spring:
   application:
     name: request-service
   config:
-    import: "optional:configserver:"
+    import: "configserver:"
   cloud:
     config:
       discovery:
