@@ -16,6 +16,7 @@ import ru.practicum.dto.user.UserDto;
 import ru.practicum.entity.Request;
 import ru.practicum.dto.request.RequestStatus;
 
+import ru.practicum.ewm.stats.proto.ActionTypeProto;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
 import ru.practicum.mapper.RequestMapper;
@@ -50,7 +51,7 @@ public class RequestServiceImpl implements RequestService {
         checkUserRequestForEvent(event, userId);
 
         Request request = RequestMapper.toRequest(event, user);
-        collectorClient.collectUserAction(userId,eventId,"ACTION_REGISTER");
+        collectorClient.collectUserAction(userId, eventId, ActionTypeProto.ACTION_REGISTER);
         request = requestRepository.save(request);
 
         var requestDto = RequestMapper.toRequestDto(request);

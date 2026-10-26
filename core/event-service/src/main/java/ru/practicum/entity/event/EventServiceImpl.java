@@ -22,6 +22,7 @@ import ru.practicum.dto.user.UserParamDto;
 import ru.practicum.entity.category.Category;
 import ru.practicum.entity.category.CategoryMapper;
 import ru.practicum.entity.category.CategoryService;
+import ru.practicum.ewm.stats.proto.ActionTypeProto;
 import ru.practicum.ewm.stats.proto.RecommendedEventProto;
 import ru.practicum.exception.ConflictException;
 import ru.practicum.exception.NotFoundException;
@@ -432,7 +433,7 @@ public class EventServiceImpl implements EventService {
     public EventFullDto getPublishedEventById(Long id, Long userId) {
         Event event = findEventByIdAndState(id, EventState.PUBLISHED);
 
-        collectorClient.collectUserAction(userId, event.getId(), "ACTION_VIEW");
+        collectorClient.collectUserAction(userId, event.getId(), ActionTypeProto.ACTION_VIEW);
 
         Map<Long, Double> eventRatings = getEventRatings(Collections.singletonList(event));
         Double rating = eventRatings.getOrDefault(event.getId(), 0.0);
@@ -464,7 +465,7 @@ public class EventServiceImpl implements EventService {
             throw new ValidationException("User with id=" + userId + " was not on event with id=" + event.getId());
         }
 
-        collectorClient.collectUserAction(userId, event.getId(), "ACTION_LIKE");
+        collectorClient.collectUserAction(userId, event.getId(), ActionTypeProto.ACTION_LIKE);
 
         log.info("Пользователь с id={} поставил лайк событию с id={}", userId, event.getId());
     }

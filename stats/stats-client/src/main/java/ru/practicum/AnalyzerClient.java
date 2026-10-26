@@ -1,5 +1,6 @@
 package ru.practicum;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.client.inject.GrpcClient;
 import org.springframework.stereotype.Component;
@@ -11,17 +12,15 @@ import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
-import static ru.practicum.ewm.stats.proto.RecommendationsControllerGrpc.RecommendationsControllerBlockingStub;
+
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class AnalyzerClient {
 
-    private final RecommendationsControllerBlockingStub client;
-
-    public AnalyzerClient(@GrpcClient("analyzer") RecommendationsControllerBlockingStub client) {
-        this.client = client;
-    }
+    @GrpcClient("analyzer")
+    private RecommendationsControllerGrpc.RecommendationsControllerBlockingStub client;
 
 
     public Stream<RecommendedEventProto> getRecommendationsForUser(Long userId, Integer maxResults) {

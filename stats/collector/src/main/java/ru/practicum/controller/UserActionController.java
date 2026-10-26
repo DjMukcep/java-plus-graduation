@@ -47,12 +47,11 @@ public class UserActionController extends UserActionControllerImplBase {
             responseObserver.onCompleted();
         } catch (Exception e) {
             responseObserver.onError(
-                    Status.INTERNAL.withDescription(e.getMessage())
+                    Status.INTERNAL.withDescription("Failed to collect user action")
                             .withCause(e)
                             .asRuntimeException()
             );
         }
-
     }
 
 }
