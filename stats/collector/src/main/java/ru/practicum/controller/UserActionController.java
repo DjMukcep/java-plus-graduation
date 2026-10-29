@@ -12,6 +12,7 @@ import ru.practicum.ewm.stats.avro.UserActionAvro;
 import ru.practicum.ewm.stats.proto.UserActionControllerGrpc.UserActionControllerImplBase;
 import ru.practicum.ewm.stats.proto.UserActionProto;
 import ru.practicum.service.KafkaActionSender;
+import ru.practicum.ewm.stats.proto.ActionTypeProto;
 
 import java.time.Instant;
 
@@ -29,7 +30,7 @@ public class UserActionController extends UserActionControllerImplBase {
             UserActionAvro message = UserActionAvro.newBuilder()
                     .setUserId(request.getUserId())
                     .setEventId(request.getEventId())
-                    .setActionType(ActionTypeAvro.valueOf(request.getActionType().name()))
+                    .setActionType(toAvroActionType(request.getActionType()))
                     .setTimestamp(Instant.ofEpochSecond(
                             request.getTimestamp().getSeconds(),
                             request.getTimestamp().getNanos()))
@@ -52,6 +53,17 @@ public class UserActionController extends UserActionControllerImplBase {
                             .asRuntimeException()
             );
         }
+    }
+
+    private ActionTypeAvro toAvroActionType(ActionTypeProto actionType) {
+        return switch (actionType) {
+            case ACTION_VIEW -> ActionTypeAvro.VIEW;
+            case ACTION_REGISTER -> ActionTypeAvro.REGISTER;
+            case ACTION_LIKE -> ActionTypeAvro.LIKE;
+            default -> throw new IllegalArgumentException(
+                    "Неизвестный тип действия: " + actionType
+            );
+        };
     }
 
 }

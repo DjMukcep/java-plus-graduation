@@ -98,9 +98,9 @@ public class UserActionProcessor implements Runnable {
 
     private float mapActionType(UserActionAvro eventAvro) {
         return switch ((eventAvro.getActionType())) {
-            case ACTION_VIEW -> 0.4f;
-            case ACTION_REGISTER -> 0.8f;
-            case ACTION_LIKE -> 1.0f;
+            case VIEW -> 0.4f;
+            case REGISTER -> 0.8f;
+            case LIKE -> 1.0f;
         };
     }
 }

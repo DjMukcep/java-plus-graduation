@@ -38,6 +38,12 @@ public class AggregationStarter {
     //ключ юзер - значение мероприятие и его оценка
     private final Map<Long, Map<Long, Double>> userEventsWeights = new HashMap<>();
 
+    // Сумма весов мероприятия
+    private final Map<Long, Double> eventWeights = new HashMap<>();
+
+    // Суммы минимумов для пар мероприятий
+    private final Map<Long, Map<Long, Double>> minSums = new HashMap<>();
+
 
     public void start() {
         addShutdownHook();
@@ -73,54 +79,153 @@ public class AggregationStarter {
 
     private void processRecord(ConsumerRecord<Long, UserActionAvro> record) {
         UserActionAvro userAction = record.value();
+        logUserAction(userAction);
+
         Long eventId = userAction.getEventId();
         Long userId = userAction.getUserId();
-        ActionTypeAvro actionType = userAction.getActionType();
 
-        log.info("new user action: {}", userAction);
+        Map<Long, Double> userWeights = getUserWeights(userId);
 
-        double incomeEventWeight = processEventWeight(actionType);
-        double oldEventWeight = getOldWeight(userId, eventId);
-        double newEventWeight = max(oldEventWeight, incomeEventWeight);
-        boolean isEventWeightChanged = oldEventWeight != newEventWeight;
+        double oldWeight = userWeights.getOrDefault(eventId, 0.0);
+        double newWeight = max(oldWeight, processEventWeight(userAction.getActionType()));
 
-        if (isEventWeightChanged) {
-            Map<Long, Double> eventsWeights = updateUserEventWeight(userId, eventId, newEventWeight);
-
-            if (eventsWeights.size() > 1) {
-                computeEventSimilarities(eventId, eventsWeights);
-            }
+        if (oldWeight == newWeight) {
+            return;
         }
+
+        updateEventWeights(eventId, userWeights, oldWeight, newWeight);
+
+        computeEventSimilarities(eventId, userWeights, userAction.getTimestamp());
     }
 
-    private Map<Long, Double> updateUserEventWeight(Long userId, Long eventId, double eventWeight) {
-        Map<Long, Double> eventsWeights = userEventsWeights.computeIfAbsent(userId, id -> new HashMap<>());
-        eventsWeights.put(eventId, eventWeight);
-        log.info("user's event weights for userId: {} - {}",userId, eventsWeights);
-
-        return eventsWeights;
+    private void logUserAction(UserActionAvro userAction) {
+        log.info("Обработка действия: userId={}, eventId={}, actionType={}",
+                userAction.getUserId(),
+                userAction.getEventId(),
+                userAction.getActionType());
     }
 
+    private Map<Long, Double> getUserWeights(Long userId) {
+        return userEventsWeights.computeIfAbsent(userId, id -> new HashMap<>());
+    }
 
-    private void computeEventSimilarities(Long eventId, Map<Long, Double> eventsWeights) {
-        for (Long otherEventId : eventsWeights.keySet()) {
+    private void updateEventWeights(
+            Long eventId,
+            Map<Long, Double> userWeights,
+            double oldWeight,
+            double newWeight
+    ) {
+        userWeights.put(eventId, newWeight);
+
+        eventWeights.merge(eventId, newWeight - oldWeight, Double::sum);
+
+        updateMinSums(eventId, userWeights, oldWeight, newWeight);
+    }
+
+    private void updateMinSums(
+            Long eventId,
+            Map<Long, Double> userWeights,
+            double oldWeight,
+            double newWeight
+    ) {
+        for (Long otherEventId : userWeights.keySet()) {
             if (eventId.equals(otherEventId)) {
                 continue;
             }
 
-            long eventIdA = min(eventId, otherEventId);
-            long eventIdB = max(eventId, otherEventId);
+            double otherWeight = userWeights.get(otherEventId);
 
-            double sumA = getSumEvent(eventIdA);
-            double sumB = getSumEvent(eventIdB);
+            double oldMin = min(oldWeight, otherWeight);
+            double newMin = min(newWeight, otherWeight);
+            double delta = newMin - oldMin;
 
-            double score = getMinSum(eventIdA,eventIdB)/(sqrt(sumA) * sqrt(sumB));
-
-            processEventsSimilarity(eventIdA, eventIdB, score);
+            if (delta != 0.0) {
+                updateMinSum(eventId, otherEventId, delta);
+            }
         }
     }
 
-    private void processEventsSimilarity(long eventA, long eventB, double score) {
+    private void updateMinSum(long eventA, long eventB, double delta) {
+        long first = min(eventA, eventB);
+        long second = max(eventA, eventB);
+
+        minSums.computeIfAbsent(first, id -> new HashMap<>())
+                .merge(second, delta, Double::sum);
+
+        log.info(
+                "Update minSum: eventA={}, eventB={}, delta={}, minSum={}",
+                first, second, delta,
+                minSums.get(first).get(second)
+        );
+    }
+
+//    private void computeEventSimilarities(
+//            Long eventId,
+//            Map<Long, Double> userWeights,
+//            Instant timestamp
+//    ) {
+//        double sumA = eventWeights.get(eventId);
+//
+//        for (Long otherEventId : userWeights.keySet()) {
+//            if (eventId.equals(otherEventId)) {
+//                continue;
+//            }
+//
+//            double sumB = eventWeights.get(otherEventId);
+//
+//            double minSum = minSums
+//                    .getOrDefault(min(eventId, otherEventId), Map.of())
+//                    .getOrDefault(max(eventId, otherEventId), 0.0);
+//
+//            if (minSum == 0) {
+//                continue;
+//            }
+//
+//            double score = minSum / (sqrt(sumA) * sqrt(sumB));
+//
+//            long eventIdA = min(eventId, otherEventId);
+//            long eventIdB = max(eventId, otherEventId);
+//
+//            processEventsSimilarity(eventIdA, eventIdB, score, timestamp);
+//        }
+//    }
+
+    private void computeEventSimilarities(
+            Long eventId,
+            Map<Long, Double> userWeights,
+            Instant timestamp
+    ) {
+        double sumA = eventWeights.get(eventId);
+
+        for (Long otherEventId : eventWeights.keySet()) {
+            if (eventId.equals(otherEventId)) {
+                continue;
+            }
+
+            double sumB = eventWeights.get(otherEventId);
+
+            double minSum = minSums
+                    .getOrDefault(min(eventId, otherEventId), Map.of())
+                    .getOrDefault(max(eventId, otherEventId), 0.0);
+
+            if (minSum == 0) {
+                continue;
+            }
+
+            double score = minSum / (sqrt(sumA) * sqrt(sumB));
+
+            long eventIdA = min(eventId, otherEventId);
+            long eventIdB = max(eventId, otherEventId);
+
+            put(eventIdA, eventIdB, score);
+
+            if (userWeights.containsKey(otherEventId)) {
+                processEventsSimilarity(eventIdA, eventIdB, score, timestamp);
+            }
+        }
+    }
+
+    private void processEventsSimilarity(long eventA, long eventB, double score, Instant timestamp) {
         put(eventA, eventB, score);
         String eventsAB = eventA + "-" + eventB;
 
@@ -128,38 +233,18 @@ public class AggregationStarter {
                 .setEventA(eventA)
                 .setEventB(eventB)
                 .setScore(score)
-                .setTimestamp(Instant.now())
+                .setTimestamp(timestamp)
                 .build();
 
         sendEvent(eventsAB,event);
     }
 
-    private double getOldWeight(Long userId, Long eventId) {
-        return userEventsWeights.computeIfAbsent(
-                userId, event -> new HashMap<>()).getOrDefault(eventId, 0.0);
-    }
-
     private double processEventWeight(ActionTypeAvro actionType) {
         return switch (actionType) {
-            case ACTION_VIEW ->  0.4;
-            case ACTION_REGISTER -> 0.8;
-            case ACTION_LIKE -> 1.0;
+            case VIEW ->  0.4;
+            case REGISTER -> 0.8;
+            case LIKE -> 1.0;
         };
-    }
-
-    private double getSumEvent(Long eventId) {
-        return userEventsWeights.values().stream()
-                .map(userEvents -> userEvents.get(eventId))
-                .filter(Objects::nonNull)
-                .mapToDouble(Double::doubleValue)
-                .sum();
-    }
-
-    private double getMinSum(Long eventIdA, Long eventIdB) {
-        return userEventsWeights.values().stream()
-                .filter(events -> events.containsKey(eventIdA) && events.containsKey(eventIdB))
-                .mapToDouble(events -> min(events.get(eventIdA), events.get(eventIdB)))
-                .sum();
     }
 
     public void put(long eventA, long eventB, double score) {
