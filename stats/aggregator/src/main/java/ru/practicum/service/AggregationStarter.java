@@ -159,37 +159,6 @@ public class AggregationStarter {
         );
     }
 
-//    private void computeEventSimilarities(
-//            Long eventId,
-//            Map<Long, Double> userWeights,
-//            Instant timestamp
-//    ) {
-//        double sumA = eventWeights.get(eventId);
-//
-//        for (Long otherEventId : userWeights.keySet()) {
-//            if (eventId.equals(otherEventId)) {
-//                continue;
-//            }
-//
-//            double sumB = eventWeights.get(otherEventId);
-//
-//            double minSum = minSums
-//                    .getOrDefault(min(eventId, otherEventId), Map.of())
-//                    .getOrDefault(max(eventId, otherEventId), 0.0);
-//
-//            if (minSum == 0) {
-//                continue;
-//            }
-//
-//            double score = minSum / (sqrt(sumA) * sqrt(sumB));
-//
-//            long eventIdA = min(eventId, otherEventId);
-//            long eventIdB = max(eventId, otherEventId);
-//
-//            processEventsSimilarity(eventIdA, eventIdB, score, timestamp);
-//        }
-//    }
-
     private void computeEventSimilarities(
             Long eventId,
             Map<Long, Double> userWeights,
