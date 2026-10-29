@@ -7,7 +7,7 @@ spring:
   application:
     name: event-service
   config:
-    import: "optional:configserver:"
+    import: "configserver:"
   cloud:
     config:
       discovery:

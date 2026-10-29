@@ -39,7 +39,7 @@ public class RequestPrivateController {
         return requestService.getUserRequests(userId);
     }
 
-    //----------proxy-----------//
+    // Internal calls
     @GetMapping("/requests")
     public List<ParticipationRequestDto> getUserRequestsByUserIdsAndEventId(
             @ModelAttribute RequestParamDto requestDto) {

@@ -21,7 +21,7 @@ eureka:
 
 logging:
   level:
-    ru.yandex.practicum.telemetry: WARN
+    serializer.AvroSerializer: WARN
     org.springframework: ERROR
 
   pattern:

@@ -1,0 +1,9 @@
+@namespace("ru.practicum.ewm.stats.avro")
+protocol EventProtocol {
+
+	record EventAvro {
+		long id;
+		long categoryId;
+		timestamp_ms eventDate;
+	}
+}

@@ -26,7 +26,9 @@
 	<properties>
 		<java.version>21</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<grpc-spring-boot-starter.version>3.1.0.RELEASE</grpc-spring-boot-starter.version>
 		<spring-cloud.version>2023.0.6</spring-cloud.version>
+		<spring-retry.version>2.0.10</spring-retry.version>
 	</properties>
 
 	<dependencyManagement>
@@ -37,6 +39,12 @@
 				<version>${spring-cloud.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>net.devh</groupId>
+				<artifactId>grpc-spring-boot-starter</artifactId>
+				<version>${grpc-spring-boot-starter.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

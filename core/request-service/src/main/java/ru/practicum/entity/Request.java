@@ -31,4 +31,16 @@ public class Request {
 
     @Column(name = "created", nullable = false)
     private LocalDateTime createdAt;
+
+    @Override
+    public boolean equals(final Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Request)) return false;
+        return id != null && id.equals(((Request) o).id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

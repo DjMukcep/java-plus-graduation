@@ -1,0 +1,32 @@
+grpc:
+  server:
+    port: 0
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:6542/ewm-stats
+    username: stat
+    password: stat
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: false
+  sql:
+    init:
+      mode: always
+kafka:
+  bootstrap-servers: localhost:9092
+  topics:
+    user-actions: stats.user-actions.v1
+    events-similarity: stats.events-similarity.v1
+  consumer:
+    group-id: analyzer-group
+    auto-commit: false
+
+analyzer:
+  recommendations:
+    neighbors-count: 5
